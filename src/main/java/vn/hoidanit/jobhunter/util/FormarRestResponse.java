@@ -34,6 +34,10 @@ public class FormarRestResponse implements ResponseBodyAdvice {
         // error
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(status);
+        // neu la String thif chuyen sangbody
+        if (body instanceof String) {
+            return body;
+        }
         if (status >= 400) {
             return body; // body ở đây chính là lỗi
         } else {
