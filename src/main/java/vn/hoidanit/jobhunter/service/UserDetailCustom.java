@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Component("userDetailsService")
 public class UserDetailCustom implements UserDetailsService {
+
     private final UserService userService;
 
     public UserDetailCustom(UserService userService) {
@@ -19,16 +20,17 @@ public class UserDetailCustom implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        vn.hoidanit.jobhunter.domain.User user = userService.handleGetUserByUserName(username);
-        System.out.println("đây chính là: " + user);
-
+        vn.hoidanit.jobhunter.domain.User user = this.userService.handleGetUserByUserName(username);
+        System.out.println("usser la: " + user);
         if (user == null) {
-            throw new UsernameNotFoundException("User not found with username: " +
-                    username);
+            throw new UsernameNotFoundException("Username/password không hợp lệ");
         }
 
-        return new User(user.getEmail(),
+        return new User(
+                user.getEmail(),
                 user.getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
+
     }
+
 }

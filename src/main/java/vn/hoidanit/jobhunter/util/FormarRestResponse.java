@@ -34,7 +34,8 @@ public class FormarRestResponse implements ResponseBodyAdvice {
         // error
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(status);
-        // neu la String thif chuyen sangbody
+
+        // nếu body là 1 chuỗi String thì không cần formatcode
         if (body instanceof String) {
             return body;
         }
