@@ -12,11 +12,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import vn.hoidanit.jobhunter.domain.RestResponse;
 
 @ControllerAdvice
-public class FormarRestResponse implements ResponseBodyAdvice {
+public class FormatRestResponse implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(MethodParameter returnType, Class converterType) {
-
         return true;
     }
 
@@ -31,17 +30,16 @@ public class FormarRestResponse implements ResponseBodyAdvice {
         HttpServletResponse servletResponse = ((ServletServerHttpResponse) response).getServletResponse();
         int status = servletResponse.getStatus();
 
-        // error
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(status);
-        if (status >= 400) {
-            return body; // body ở đây chính là lỗi
-        } else {
-            // case susses
-            res.setData(body);
-            res.setMesage("call api success");
 
+        if (status >= 400) {
+            return body;
+        } else {
+            res.setData(body);
+            res.setMessage("CALL API SUCCESS");
         }
+
         return res;
     }
 

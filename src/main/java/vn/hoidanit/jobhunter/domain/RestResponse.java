@@ -1,12 +1,11 @@
 package vn.hoidanit.jobhunter.domain;
 
-// import com.mysql.cj.x.protobuf.MysqlxDatatypes.Object;
-// import com.mysql.cj.x.protobuf.MysqlxDatatypes.Scalar.String;
-
 public class RestResponse<T> {
     private int statusCode;
     private String error;
-    private Object mesage;
+
+    // message có thể là string, hoặc arrayList
+    private Object message;
     private T data;
 
     public int getStatusCode() {
@@ -25,12 +24,12 @@ public class RestResponse<T> {
         this.error = error;
     }
 
-    public Object getMesage() {
-        return mesage;
+    public Object getMessage() {
+        return message;
     }
 
-    public void setMesage(Object mesage) {
-        this.mesage = mesage;
+    public void setMessage(Object message) {
+        this.message = message;
     }
 
     public T getData() {

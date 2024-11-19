@@ -15,59 +15,58 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.service.UserService;
-import vn.hoidanit.jobhunter.util.error.idInvalidException;
+import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
 @RestController
 public class UserController {
-    // không nên sử dụng annotation @autorite
     private final UserService userService;
 
-    private final PasswordEncoder passwordEncoder; // gọi interface mã hóa passwword
+    private final PasswordEncoder passwordEncoder;
 
     public UserController(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
     }
 
-    // thêm mới
     @PostMapping("/users")
-    public ResponseEntity<User> createUser(@RequestBody User posUser) {
-        String hashPassword = this.passwordEncoder.encode(posUser.getPassword()); // kỹ thuật hashPassword
-        posUser.setPassword(hashPassword);
-        User newUser = this.userService.handleCreateUser(posUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
+    public ResponseEntity<User> createNewUser(@RequestBody User postManUser) {
+        String hashPassword = this.passwordEncoder.encode(postManUser.getPassword());
+        postManUser.setPassword(hashPassword);
+        User ericUser = this.userService.handleCreateUser(postManUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ericUser);
     }
 
-    // xóa
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable long id) throws idInvalidException {
+    public ResponseEntity<String> deleteUser(@PathVariable("id") long id)
+            throws IdInvalidException {
         if (id >= 1500) {
-            throw new idInvalidException("id khong duoc > 1500");
+            throw new IdInvalidException("Id khong lon hown 1501");
         }
+
         this.userService.handleDeleteUser(id);
-        return ResponseEntity.status(HttpStatus.OK).body("đã xóa thành công");
+        return ResponseEntity.ok("ericUser");
+        // return ResponseEntity.status(HttpStatus.OK).body("ericUser");
     }
 
-    // tìm 1 giá trị
+    // fetch user by id
     @GetMapping("/users/{id}")
-    public ResponseEntity<User> getFindByIdUser(@PathVariable("id") Long id) throws idInvalidException {
-        if (id >= 1500) {
-            throw new idInvalidException("id khong duoc > 1500");
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(this.userService.handleFindByIdUser(id));
+    public ResponseEntity<User> getUserById(@PathVariable("id") long id) {
+        User fetchUser = this.userService.fetchUserById(id);
+        // return ResponseEntity.ok(fetchUser);
+        return ResponseEntity.status(HttpStatus.OK).body(fetchUser);
     }
 
-    // tìm all user
+    // fetch all users
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getMethodName() {
-        return ResponseEntity.status(HttpStatus.OK).body(this.userService.handleFindAllUser());
+    public ResponseEntity<List<User>> getAllUser() {
+        // return ResponseEntity.ok(this.userService.fetchAllUser());
+        return ResponseEntity.status(HttpStatus.OK).body(this.userService.fetchAllUser());
     }
 
-    // cập nhật
     @PutMapping("/users")
     public ResponseEntity<User> updateUser(@RequestBody User user) {
-        User udUser = this.userService.handleUpdateUser(user);
-        return ResponseEntity.status(HttpStatus.OK).body(udUser);
+        User ericUser = this.userService.handleUpdateUser(user);
+        return ResponseEntity.ok(ericUser);
     }
 
 }

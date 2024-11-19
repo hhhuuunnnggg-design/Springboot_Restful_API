@@ -6,56 +6,50 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import vn.hoidanit.jobhunter.domain.User;
-import vn.hoidanit.jobhunter.repository.UserServiceRepository;
+import vn.hoidanit.jobhunter.repository.UserRepository;
 
 @Service
 public class UserService {
-    // cái này nó tự như Autorite
-    private final UserServiceRepository userServiceRepository;
 
-    public UserService(UserServiceRepository userServiceRepository) {
-        this.userServiceRepository = userServiceRepository;
+    private final UserRepository userRepository;
+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     public User handleCreateUser(User user) {
-        return this.userServiceRepository.save(user);
+        return this.userRepository.save(user);
     }
 
-    public void handleDeleteUser(Long id) {
-        this.userServiceRepository.deleteById(id);
+    public void handleDeleteUser(long id) {
+        this.userRepository.deleteById(id);
     }
 
-    // tìm 1 giá trị
-    public User handleFindByIdUser(Long id) {
-        Optional<User> UserOption = this.userServiceRepository.findById(id);
-        if (UserOption.isPresent()) {
-            return UserOption.get();
+    public User fetchUserById(long id) {
+        Optional<User> userOptional = this.userRepository.findById(id);
+        if (userOptional.isPresent()) {
+            return userOptional.get();
         }
         return null;
     }
 
-    // tìm nhiều giá trị
-    public List<User> handleFindAllUser() {
-        return this.userServiceRepository.findAll();
+    public List<User> fetchAllUser() {
+        return this.userRepository.findAll();
     }
 
-    public User handleUpdateUser(User updateUser) {
-        User currentUser = this.handleFindByIdUser(updateUser.getId());
+    public User handleUpdateUser(User reqUser) {
+        User currentUser = this.fetchUserById(reqUser.getId());
         if (currentUser != null) {
-            currentUser.setEmail(updateUser.getEmail());
-            currentUser.setPassword(updateUser.getPassword());
-            currentUser.setUsername(updateUser.getUsername());
-            // updateUser
-            return this.userServiceRepository.save(currentUser);
+            currentUser.setEmail(reqUser.getEmail());
+            currentUser.setName(reqUser.getName());
+            currentUser.setPassword(reqUser.getPassword());
+            // update
+            currentUser = this.userRepository.save(currentUser);
         }
         return currentUser;
     }
 
-    public User handleGetUserByUserName(String username) {
-        return this.userServiceRepository.findByEmail(username);
+    public User handleGetUserByUsername(String username) {
+        return this.userRepository.findByEmail(username);
     }
-
-    // public User handleGetUserByUserName(String username) {
-    // return this.userServiceRepository.findByUsername(username);
-    // }
 }

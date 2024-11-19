@@ -10,29 +10,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.dto.LoginDTO;
-import vn.hoidanit.jobhunter.util.SecurityUtil;
 
-@RestController // @RestController giúp biến nó thành 1 cái API
+@RestController
 public class AuthController {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final SecurityUtil securityUtil;
 
-    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil) {
+    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
-        this.securityUtil = securityUtil;
     }
 
     @PostMapping("/login")
     public ResponseEntity<LoginDTO> login(@Valid @RequestBody LoginDTO loginDto) {
-        // nạp input và password vào security
+        // Nạp input gồm username/password vào Security
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 loginDto.getUsername(), loginDto.getPassword());
 
-        // xác thực người dùng->cần viết hàm load UserByUserName
+        // xác thực người dùng => cần viết hàm loadUserByUsername
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        //tao token
-        this.securityUtil.creaToken(authentication);
         return ResponseEntity.ok().body(loginDto);
     }
 }

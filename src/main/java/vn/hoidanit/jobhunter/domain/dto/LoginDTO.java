@@ -3,7 +3,7 @@ package vn.hoidanit.jobhunter.domain.dto;
 import jakarta.validation.constraints.NotBlank;
 
 public class LoginDTO {
-    @NotBlank(message = "user không được để trống") // sử dụng được cái này là do đã có @valid
+    @NotBlank(message = "username không được để trống")
     private String username;
 
     @NotBlank(message = "password không được để trống")
