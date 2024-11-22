@@ -16,6 +16,11 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
+import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
@@ -32,18 +37,25 @@ public class SecurityConfiguration {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // mã hoá mật khảu người dùng bằng thuật toán
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
         http
                 .csrf(c -> c.disable())
                 .authorizeHttpRequests(
                         authz -> authz
                                 .requestMatchers("/", "/login").permitAll()
-                                .anyRequest().authenticated())// cần xác thực mọi lời request
-                .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()))
+                                .anyRequest().authenticated())
+                .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())
+                        .authenticationEntryPoint((AuthenticationEntryPoint) customAuthenticationEntryPoint))
+                // .exceptionHandling(
+                // exceptions -> exceptions
+                // .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint()) // 401
+                // .accessDeniedHandler(new BearerTokenAccessDeniedHandler())) // 403
 
                 .formLogin(f -> f.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -52,8 +64,14 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public JwtEncoder jwtEncoder() {
-        return new NimbusJwtEncoder(new ImmutableSecret<>(getSecretKey()));
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        grantedAuthoritiesConverter.setAuthorityPrefix("");
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("hoidanit");
+
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+        return jwtAuthenticationConverter;
     }
 
     @Bean
@@ -70,7 +88,11 @@ public class SecurityConfiguration {
         };
     }
 
-    // lấy key
+    @Bean
+    public JwtEncoder jwtEncoder() {
+        return new NimbusJwtEncoder(new ImmutableSecret<>(getSecretKey()));
+    }
+
     private SecretKey getSecretKey() {
         byte[] keyBytes = Base64.from(jwtKey).decode();
         return new SecretKeySpec(keyBytes, 0, keyBytes.length,
