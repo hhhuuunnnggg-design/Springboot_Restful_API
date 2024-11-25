@@ -39,8 +39,9 @@ public class CompanyController {
 
         Pageable pageable= PageRequest.of(page-1, size);
 
-        List<Company> companies = this.companyService.handleGetCompany(pageable);
-        return ResponseEntity.ok(companies);
+       // List<Company> companies = this.companyService.handleGetCompany(pageable);
+        //return ResponseEntity.ok(companies);
+        return  null;
     }
 
     @DeleteMapping("/{id}")
