@@ -12,9 +12,9 @@ import org.springframework.stereotype.Component;
 @Component("userDetailsService")
 public class UserDetailCustom implements UserDetailsService {
 
-    private final UserService userService;
+    private final UserServices userService;
 
-    public UserDetailCustom(UserService userService) {
+    public UserDetailCustom(UserServices userService) {
         this.userService = userService;
     }
 

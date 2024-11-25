@@ -1,36 +1,57 @@
 package vn.hoidanit.jobhunter.controller;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import vn.hoidanit.jobhunter.domain.User;
-import vn.hoidanit.jobhunter.service.UserService;
+import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDTO;
+import vn.hoidanit.jobhunter.service.UserServices;
 import vn.hoidanit.jobhunter.util.error.idInvalidException;
 
+
 @RestController
+@RequestMapping(value = "/users")
 public class UserController {
     // không nên sử dụng annotation @autorite
-    private final UserService userService;
+    private final UserServices userService;
 
     private final PasswordEncoder passwordEncoder; // gọi interface mã hóa passwword
 
-    public UserController(UserService userService, PasswordEncoder passwordEncoder) {
+    public UserController(UserServices userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
     }
 
+    // tìm all user
+    @GetMapping("")
+    public ResponseEntity<?> getAllUser(
+            @RequestParam("current") Optional<String> currentOptional,
+            @RequestParam("pageSize") Optional<String> pageSizeOptional) {
+
+        String sCurrent = currentOptional.isPresent() ? currentOptional.get() : "";
+        String sPageSize = pageSizeOptional.isPresent() ? pageSizeOptional.get() : "";
+
+        int current = Integer.parseInt(sCurrent);
+        int pageSize = Integer.parseInt(sPageSize);
+
+        Pageable pageable = PageRequest.of(current - 1, pageSize);
+
+
+        return ResponseEntity.status(HttpStatus.OK).body(this.userService.fetchAllUser(pageable));
+    }
+
+
+
     // thêm mới
-    @PostMapping("/users")
+    @PostMapping("")
     public ResponseEntity<User> createUser(@RequestBody User posUser) {
         String hashPassword = this.passwordEncoder.encode(posUser.getPassword()); // kỹ thuật hashPassword
         posUser.setPassword(hashPassword);
@@ -39,7 +60,7 @@ public class UserController {
     }
 
     // xóa
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable long id) throws idInvalidException {
         if (id >= 1500) {
             throw new idInvalidException("id khong duoc > 1500");
@@ -49,7 +70,7 @@ public class UserController {
     }
 
     // tìm 1 giá trị
-    @GetMapping("/users/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<User> getFindByIdUser(@PathVariable("id") Long id) throws idInvalidException {
         if (id >= 1500) {
             throw new idInvalidException("id khong duoc > 1500");
@@ -57,14 +78,8 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(this.userService.handleFindByIdUser(id));
     }
 
-    // tìm all user
-    @GetMapping("/users")
-    public ResponseEntity<List<User>> getMethodName() {
-        return ResponseEntity.status(HttpStatus.OK).body(this.userService.handleFindAllUser());
-    }
-
     // cập nhật
-    @PutMapping("/users")
+    @PutMapping("")
     public ResponseEntity<User> updateUser(@RequestBody User user) {
         User udUser = this.userService.handleUpdateUser(user);
         return ResponseEntity.status(HttpStatus.OK).body(udUser);
