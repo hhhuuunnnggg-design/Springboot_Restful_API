@@ -3,24 +3,29 @@ package vn.hoidanit.jobhunter.service;
 import java.util.List;
 import java.util.Optional;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.dto.Meta;
+import vn.hoidanit.jobhunter.domain.dto.ResCreateUserDTO;
+import vn.hoidanit.jobhunter.domain.dto.ResUpdateUserDTO;
 import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.repository.UserServiceRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 @Service
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class UserServices {
-    // cái này nó tự như Autorite
-    private final UserServiceRepository userServiceRepository;
 
-    public UserServices(UserServiceRepository userServiceRepository) {
-        this.userServiceRepository = userServiceRepository;
-    }
+    UserServiceRepository userServiceRepository;
+
 
     public User handleCreateUser(User user) {
         return this.userServiceRepository.save(user);
@@ -57,8 +62,6 @@ public class UserServices {
         return null;
     }
 
-
-
     public User handleUpdateUser(User updateUser) {
         User currentUser = this.handleFindByIdUser(updateUser.getId());
         if (currentUser != null) {
@@ -70,12 +73,32 @@ public class UserServices {
         }
         return currentUser;
     }
-
     public User handleGetUserByUserName(String username) {
         return this.userServiceRepository.findByEmail(username);
     }
 
-    // public User handleGetUserByUserName(String username) {
-    // return this.userServiceRepository.findByUsername(username);
-    // }
+    public ResCreateUserDTO convertToResCreateUserDTO(User user) {
+        ResCreateUserDTO rs=new ResCreateUserDTO();
+        rs.setId(user.getId());
+        rs.setUsername(user.getUsername());
+        rs.setEmail(user.getEmail());
+        rs.setGender(user.getGender());
+        rs.setAddress(user.getAddress());
+        rs.setAge(user.getAge());
+        rs.setCreatedAt(user.getCreatedAt());
+        return rs;
+    }
+    public ResUpdateUserDTO convertToResUpdateUserDTO(User user) {
+        ResUpdateUserDTO rs=new ResUpdateUserDTO();
+        rs.setId(user.getId());
+        rs.setUsername(user.getUsername());
+        rs.setGender(user.getGender());
+        rs.setAddress(user.getAddress());
+        rs.setAge(user.getAge());
+        rs.setUpdatedAt(user.getUpdatedAt());
+        return rs;
+    }
+    public boolean isEmailExist(String email) {
+        return this.userServiceRepository.existsByEmail(email);
+    }
 }

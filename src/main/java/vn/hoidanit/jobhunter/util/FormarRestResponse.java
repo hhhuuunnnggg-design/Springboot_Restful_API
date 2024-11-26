@@ -47,9 +47,6 @@ public class FormarRestResponse implements ResponseBodyAdvice {
             res.setData(body);
             ApiMessage message=returnType.getMethodAnnotation(ApiMessage.class);
             res.setMesage(message!=null?message.value():"CALL API SUCCESS");
-
-
-
         }
         return res;
     }

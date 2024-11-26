@@ -1,14 +1,26 @@
 package vn.hoidanit.jobhunter.domain.dto;
 
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+@Getter
+@Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ResLoginDTO {
-    private String accessToken;
+    String accessToken;
+    UserLogin user;
 
-    public String getAccessToken() {
-        return accessToken;
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    public static class UserLogin {
+        Long id;
+        String name;
+        String email;
+
     }
 
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
 
 }

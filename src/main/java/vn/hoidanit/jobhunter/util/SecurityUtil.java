@@ -19,6 +19,7 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
+import vn.hoidanit.jobhunter.domain.dto.ResLoginDTO;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -32,13 +33,15 @@ public class SecurityUtil {
     @Value("${hoidanit.jwt.base64-secret}")
     private String jwtKey;
 
-    @Value("${hoidanit.jwt.token-validity-in-seconds}")
-    private long jwtExpiration;
+    @Value("${hoidanit.jwt.access-token-validity-in-seconds}")
+    private long accessTokenExpiration;
 
-    public String createToken(Authentication authentication) {
+    @Value("${hoidanit.jwt.refresh-token-validity-in-seconds}")
+    private long refreshTokenExpiration;
+
+    public String createAccessToken(Authentication authentication) {
         Instant now = Instant.now();
-        Instant validity = now.plus(this.jwtExpiration, ChronoUnit.SECONDS);
-
+        Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
         // @formatter:off
         JwtClaimsSet claims = JwtClaimsSet.builder()
             .issuedAt(now)
@@ -46,11 +49,24 @@ public class SecurityUtil {
             .subject(authentication.getName())
             .claim("hoidanit", authentication)
             .build();
-
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
         return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
-
     }
+
+    public String refreshToken(String email,ResLoginDTO dto) {
+        Instant now = Instant.now();
+        Instant validity = now.plus(this.refreshTokenExpiration, ChronoUnit.SECONDS);
+        // @formatter:off
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuedAt(now)
+                .expiresAt(validity)
+                .subject(email)
+                .claim("user", dto.getUser())
+                .build();
+        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+    }
+
     public static Optional<String> getCurrentUserLogin() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         return Optional.ofNullable(extractPrincipal(securityContext.getAuthentication()));

@@ -8,4 +8,6 @@ public interface UserServiceRepository extends JpaRepository<User, Long>, JpaSpe
     User findByEmail(String email);
 
     User findByUsername(String username);
+
+    boolean existsByEmail(String email);
 }

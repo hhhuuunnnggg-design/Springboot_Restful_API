@@ -19,7 +19,8 @@ import vn.hoidanit.jobhunter.domain.RestResponse;
 public class GlobalExcaption {// Phạm vi sử dụng là ở claau bồ
     @ExceptionHandler(value = {
             UsernameNotFoundException.class,
-            BadCredentialsException.class
+            BadCredentialsException.class,
+            IdInvalidException.class,
     })
     public ResponseEntity<RestResponse<Object>> handleIdException(Exception ex) {
         RestResponse<Object> res = new RestResponse<Object>();
