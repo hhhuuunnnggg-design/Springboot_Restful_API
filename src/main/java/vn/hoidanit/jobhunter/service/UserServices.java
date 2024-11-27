@@ -2,6 +2,7 @@ package vn.hoidanit.jobhunter.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -11,10 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import vn.hoidanit.jobhunter.domain.User;
-import vn.hoidanit.jobhunter.domain.dto.Meta;
-import vn.hoidanit.jobhunter.domain.dto.ResCreateUserDTO;
-import vn.hoidanit.jobhunter.domain.dto.ResUpdateUserDTO;
-import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDTO;
+import vn.hoidanit.jobhunter.domain.dto.*;
 import vn.hoidanit.jobhunter.repository.UserServiceRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,17 +36,32 @@ public class UserServices {
     // tìm nhiều giá trị
     public ResultPaginationDTO fetchAllUser(Specification<User> spec, Pageable pageable) {
         Page<User> pageUsers = this.userServiceRepository.findAll(spec, pageable);
-        ResultPaginationDTO rs=new ResultPaginationDTO();
-        Meta mt=new Meta();
+        ResultPaginationDTO rs = new ResultPaginationDTO();
+        Meta mt = new Meta();
 
-        mt.setPage(pageable.getPageNumber()+1);
+        mt.setPage(pageable.getPageNumber() + 1);
         mt.setPageSize(pageable.getPageSize());
 
         mt.setPages(pageUsers.getTotalPages());
         mt.setTotal(pageUsers.getTotalElements());
 
         rs.setMeta(mt);
-        rs.setResult(pageUsers.getContent());
+        //rs.setResult(pageUsers.getContent());
+        // remove sensitive data
+
+        List<ResUserDTO> listUser = pageUsers.getContent()
+                .stream().map(item -> new ResUserDTO(
+                        item.getId(),
+                        item.getEmail(),
+                        item.getUsername(),
+                        item.getGender(),
+                        item.getAddress(),
+                        item.getAge(),
+                        item.getUpdatedAt(),
+                        item.getCreatedAt()))
+                .collect(Collectors.toList());
+
+        rs.setResult(listUser);
 
         return rs;
     }
@@ -73,12 +86,13 @@ public class UserServices {
         }
         return currentUser;
     }
+
     public User handleGetUserByUserName(String username) {
         return this.userServiceRepository.findByEmail(username);
     }
 
     public ResCreateUserDTO convertToResCreateUserDTO(User user) {
-        ResCreateUserDTO rs=new ResCreateUserDTO();
+        ResCreateUserDTO rs = new ResCreateUserDTO();
         rs.setId(user.getId());
         rs.setUsername(user.getUsername());
         rs.setEmail(user.getEmail());
@@ -88,8 +102,9 @@ public class UserServices {
         rs.setCreatedAt(user.getCreatedAt());
         return rs;
     }
+
     public ResUpdateUserDTO convertToResUpdateUserDTO(User user) {
-        ResUpdateUserDTO rs=new ResUpdateUserDTO();
+        ResUpdateUserDTO rs = new ResUpdateUserDTO();
         rs.setId(user.getId());
         rs.setUsername(user.getUsername());
         rs.setGender(user.getGender());
@@ -98,7 +113,17 @@ public class UserServices {
         rs.setUpdatedAt(user.getUpdatedAt());
         return rs;
     }
+
     public boolean isEmailExist(String email) {
         return this.userServiceRepository.existsByEmail(email);
+    }
+
+    // caâp nhật refet token
+    public void updateUserToken(String token, String email) {
+        User currentUser = this.handleGetUserByUserName(email);
+        if (currentUser != null) {
+            currentUser.setRefreshToken(token);
+            this.userServiceRepository.save(currentUser);
+        }
     }
 }

@@ -2,6 +2,9 @@ package vn.hoidanit.jobhunter.controller;
 
 import com.turkraft.springfilter.boot.Filter;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,13 +16,13 @@ import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.service.CompanyService;
 import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
 
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/companies")
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CompanyController {
-    @Autowired
+
     private CompanyService companyService;
 
     @PostMapping("")
@@ -31,10 +34,10 @@ public class CompanyController {
     @GetMapping("")
     @ApiMessage("fetch all company")
     public ResponseEntity<?> getAllCompany(
-           @Filter Specification<Company> specification,
-           Pageable pageable
+            @Filter Specification<Company> specification,
+            Pageable pageable
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(this.companyService.handleGetAllCompany(specification,pageable));
+        return ResponseEntity.status(HttpStatus.OK).body(this.companyService.handleGetAllCompany(specification, pageable));
 
     }
 
@@ -53,7 +56,6 @@ public class CompanyController {
         }
         return ResponseEntity.ok(updatedCompany);
     }
-
 
 
 }

@@ -36,9 +36,9 @@ public class SecurityUtil {
     @Value("${hoidanit.jwt.access-token-validity-in-seconds}")
     private long accessTokenExpiration;
 
+
     @Value("${hoidanit.jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenExpiration;
-
     public String createAccessToken(Authentication authentication) {
         Instant now = Instant.now();
         Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);

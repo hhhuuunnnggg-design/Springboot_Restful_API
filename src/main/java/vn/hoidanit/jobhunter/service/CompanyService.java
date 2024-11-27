@@ -22,7 +22,6 @@ import java.util.Optional;
 @AllArgsConstructor
 public class CompanyService {
 
-
     CompanyRepository companyRepository;
 
     public Company handleCreateCompany(Company company) {

@@ -2,6 +2,10 @@ package vn.hoidanit.jobhunter.controller;
 
 import com.turkraft.springfilter.boot.Filter;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -18,16 +22,13 @@ import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
 @RestController
 @RequestMapping(value = "/users")
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserController {
-    // không nên sử dụng annotation @autorite
-    private final UserServices userService;
 
-    private final PasswordEncoder passwordEncoder; // gọi interface mã hóa passwword
+    private UserServices userService;
+    private PasswordEncoder passwordEncoder; // gọi interface mã hóa passwword
 
-    public UserController(UserServices userService, PasswordEncoder passwordEncoder) {
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     // thêm mới
     @PostMapping("")
@@ -49,12 +50,9 @@ public class UserController {
     @ApiMessage("fetch all users")
     public ResponseEntity<?> getAllUser(
             @Filter Specification<User> spec,
-            Pageable pageable ) {
-        return ResponseEntity.status(HttpStatus.OK).body(this.userService.fetchAllUser(spec,pageable));
+            Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(this.userService.fetchAllUser(spec, pageable));
     }
-
-
-
 
 
     // xóa

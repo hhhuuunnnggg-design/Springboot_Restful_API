@@ -1,5 +1,12 @@
 package vn.hoidanit.jobhunter.controller;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -24,12 +31,16 @@ public class AuthController {
     private final SecurityUtil securityUtil;
     private final UserServices userServices;
 
+    @Value("${hoidanit.jwt.refresh-token-validity-in-seconds}")
+    private long refreshTokenExpiration;
+
     public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder,
-                          SecurityUtil securityUtil, UserServices userServices) {
+                          SecurityUtil securityUtil, UserServices userService) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.securityUtil = securityUtil;
-        this.userServices = userServices;
+        this.userServices = userService;
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<ResLoginDTO> login(@Valid @RequestBody LoginDTO loginDto) {
@@ -48,13 +59,30 @@ public class AuthController {
 
         User currentUserDb = this.userServices.handleGetUserByUserName(loginDto.getUsername());
         if (currentUserDb != null) {
-            ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(currentUserDb.getId(), currentUserDb.getUsername(), currentUserDb.getEmail());
+            ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(currentUserDb.getId(),
+                    currentUserDb.getUsername(),
+                    currentUserDb.getEmail());
             res.setUser(userLogin);
         }
         res.setAccessToken(access_token);
 
         //create refesh token
-        String refesh_token=this.securityUtil.refreshToken(loginDto.getUsername(),res);
-        return ResponseEntity.ok().body(res);
+        String refesh_token = this.securityUtil.refreshToken(loginDto.getUsername(), res);
+
+        //setcooki
+        ResponseCookie responseCookie = ResponseCookie
+                .from("refresh_token", refesh_token)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(refreshTokenExpiration)
+                .build();
+
+        this.userServices.updateUserToken(refesh_token, loginDto.getUsername());
+
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
+                .body(res);
     }
 }

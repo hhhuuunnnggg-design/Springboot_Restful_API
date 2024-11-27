@@ -45,22 +45,26 @@ public class SecurityConfiguration {
             HttpSecurity http,
             CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
         http
+                // 1. Tắt CSRF (Cross-Site Request Forgery) protection
                 .csrf(c -> c.disable())
+                // 2. Bật CORS (Cross-Origin Resource Sharing) với các cấu hình mặc định
                 .cors(Customizer.withDefaults())
+                // 3. Cấu hình quyền truy cập cho các request
                 .authorizeHttpRequests(
                         authz -> authz
+                                // 3.1 Cho phép truy cập không cần xác thực cho trang chủ ("/") và trang đăng nhập ("/login")
                                 .requestMatchers("/", "/login").permitAll()
+                                // 3.2 Các request còn lại yêu cầu phải được xác thực
                                 .anyRequest().authenticated())
+                // 4. Cấu hình OAuth2 Resource Server với JWT
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())
+                        // 4.1 Đặt CustomAuthenticationEntryPoint làm entry point khi xác thực không thành công
                         .authenticationEntryPoint((AuthenticationEntryPoint) customAuthenticationEntryPoint))
-                // .exceptionHandling(
-                // exceptions -> exceptions
-                // .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint()) // 401
-                // .accessDeniedHandler(new BearerTokenAccessDeniedHandler())) // 403
-
+                // 5. Tắt form login (không dùng cơ chế đăng nhập truyền thống với form HTML)
                 .formLogin(f -> f.disable())
+                // 6. Cấu hình session không lưu trạng thái (stateless)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
+        // Trả về đối tượng SecurityFilterChain đã được cấu hình
         return http.build();
     }
 
