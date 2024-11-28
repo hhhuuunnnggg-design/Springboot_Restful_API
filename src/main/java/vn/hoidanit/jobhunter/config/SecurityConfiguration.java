@@ -53,7 +53,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(
                         authz -> authz
                                 // 3.1 Cho phép truy cập không cần xác thực cho trang chủ ("/") và trang đăng nhập ("/login")
-                                .requestMatchers("/", "/login").permitAll()
+                                .requestMatchers("/", "/login","/refresh").permitAll()
                                 // 3.2 Các request còn lại yêu cầu phải được xác thực
                                 .anyRequest().authenticated())
                 // 4. Cấu hình OAuth2 Resource Server với JWT
@@ -72,8 +72,7 @@ public class SecurityConfiguration {
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         grantedAuthoritiesConverter.setAuthorityPrefix("");
-        grantedAuthoritiesConverter.setAuthoritiesClaimName("user");
-
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("permission");
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
         return jwtAuthenticationConverter;

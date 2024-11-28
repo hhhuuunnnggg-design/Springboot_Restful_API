@@ -40,12 +40,12 @@ public class User {
     //    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
     @PrePersist
     public void handleBeforeCreate() {
-        String currentUser = SecurityUtil.getCurrentUserLogin().orElse("");
-        System.out.println("Current User Login: " + currentUser); // Thêm log kiểm tra
-        this.createdBy = currentUser;
+        this.createdBy = SecurityUtil.getCurrentUserLogin().isPresent() == true
+                ? SecurityUtil.getCurrentUserLogin().get()
+                : "";
+
         this.createdAt = Instant.now();
     }
-
     @PreUpdate
     public void handleBeforeUpdate() {
         this.updatedBy = SecurityUtil.getCurrentUserLogin().isPresent() == true
