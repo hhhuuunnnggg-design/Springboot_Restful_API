@@ -24,6 +24,7 @@ import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
 
 @RestController // @RestController giúp biến nó thành 1 cái API
+@RequestMapping(value = "/api/v1/auth/")
 public class AuthController {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;

@@ -18,7 +18,7 @@ import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
 
 
 @RestController
-@RequestMapping(value = "/companies")
+@RequestMapping(value = "/api/v1/companies")
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CompanyController {
@@ -42,9 +42,9 @@ public class CompanyController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCompany(@PathVariable("id") long id) {
+    public ResponseEntity<Void> deleteCompany(@PathVariable("id") long id) {
         this.companyService.handleDeleteCompany(id);
-        return ResponseEntity.ok("đã xoóa thành công");
+        return ResponseEntity.ok(null);
     }
 
     @PutMapping("")

@@ -53,7 +53,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(
                         authz -> authz
                                 // 3.1 Cho phép truy cập không cần xác thực cho trang chủ ("/") và trang đăng nhập ("/login")
-                                .requestMatchers("/", "/login","/refresh").permitAll()
+                                .requestMatchers("/", "/api/v1/auth/login","/api/v1/auth/refresh").permitAll()
                                 // 3.2 Các request còn lại yêu cầu phải được xác thực
                                 .anyRequest().authenticated())
                 // 4. Cấu hình OAuth2 Resource Server với JWT
