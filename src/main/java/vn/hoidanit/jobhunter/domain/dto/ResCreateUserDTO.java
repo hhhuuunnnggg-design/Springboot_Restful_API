@@ -6,7 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import vn.hoidanit.jobhunter.domain.Enum.genderEnum;
+import vn.hoidanit.jobhunter.domain.Enum.GenderEnum;
 
 
 @Getter
@@ -14,9 +14,9 @@ import vn.hoidanit.jobhunter.domain.Enum.genderEnum;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ResCreateUserDTO {
     long id;
-    String username;
+    String name;
     String email;
-    genderEnum gender;
+    GenderEnum gender;
     String address;
     int age;
     Instant createdAt;

@@ -1,43 +1,47 @@
 package vn.hoidanit.jobhunter.domain;
 
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.FieldDefaults;
-import vn.hoidanit.jobhunter.domain.Enum.genderEnum;
-import vn.hoidanit.jobhunter.util.SecurityUtil;
-
 import java.time.Instant;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
+import vn.hoidanit.jobhunter.domain.Enum.GenderEnum;
+import vn.hoidanit.jobhunter.util.SecurityUtil;
+
+
 @Entity
+@Table(name = "users")
 @Getter
 @Setter
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    long id;
-    @NotBlank(message = "tên không đươợc để trống")
-    String username;
-    @NotBlank(message = "passwork không được để trống")
-    String password;
-    String email;
-    int age;
+    private long id;
+
+    private String name;
+
+    @NotBlank(message = "email không được để trống")
+    private String email;
+
+    @NotBlank(message = "password không được để trống")
+    private String password;
+
+    private int age;
+
     @Enumerated(EnumType.STRING)
-    genderEnum gender;
-    String address;
+    private GenderEnum gender;
+
+    private String address;
+
     @Column(columnDefinition = "MEDIUMTEXT")
-    String refreshToken;
-    Instant createdAt;
-    Instant updatedAt;
-    String createdBy;
-    String updatedBy;
-    //    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
+    private String refreshToken;
+
+    private Instant createdAt;
+    private Instant updatedAt;
+    private String createdBy;
+    private String updatedBy;
+
     @PrePersist
     public void handleBeforeCreate() {
         this.createdBy = SecurityUtil.getCurrentUserLogin().isPresent() == true
@@ -46,13 +50,13 @@ public class User {
 
         this.createdAt = Instant.now();
     }
+
     @PreUpdate
     public void handleBeforeUpdate() {
         this.updatedBy = SecurityUtil.getCurrentUserLogin().isPresent() == true
                 ? SecurityUtil.getCurrentUserLogin().get()
                 : "";
+
         this.updatedAt = Instant.now();
     }
-
-
 }

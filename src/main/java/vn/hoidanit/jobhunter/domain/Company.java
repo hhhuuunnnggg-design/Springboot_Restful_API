@@ -1,60 +1,64 @@
 package vn.hoidanit.jobhunter.domain;
 
 import java.time.Instant;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.FieldDefaults;
 import vn.hoidanit.jobhunter.util.SecurityUtil;
 
-@Entity
 @Table(name = "companies")
+@Entity
 @Getter
 @Setter
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Company {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    long id;
+    private long id;
 
-    @NotBlank(message = "không được để trống")//validate dữ liệu
-    String name;
+    @NotBlank(message = "name không được để trống")
+    private String name;
 
     @Column(columnDefinition = "MEDIUMTEXT")
-    String description;
+    private String description;
 
-    String address;
+    private String address;
 
-    String logo;
+    private String logo;
 
-    Instant createdAt;
+    // @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
+    private Instant createdAt;
 
-    Instant updatedAt;
+    private Instant updatedAt;
 
-    String createdBy;
+    private String createdBy;
 
-    String updatedBy;
+    private String updatedBy;
 
-    //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7") // format date
-
-    @PrePersist // có chức nang ghi đè khi thêm moi
-    public void handlebeforCreate() {
-        this.createdAt = Instant.now();
+    @PrePersist
+    public void handleBeforeCreate() {
         this.createdBy = SecurityUtil.getCurrentUserLogin().isPresent() == true
-                ? SecurityUtil.getCurrentUserLogin().get() : "";
-    }
+                ? SecurityUtil.getCurrentUserLogin().get()
+                : "";
 
+        this.createdAt = Instant.now();
+    }
 
     @PreUpdate
     public void handleBeforeUpdate() {
-        this.updatedAt = Instant.now();
         this.updatedBy = SecurityUtil.getCurrentUserLogin().isPresent() == true
                 ? SecurityUtil.getCurrentUserLogin().get()
                 : "";
 
+        this.updatedAt = Instant.now();
     }
 }

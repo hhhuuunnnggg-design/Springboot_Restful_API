@@ -1,6 +1,6 @@
 package vn.hoidanit.jobhunter.domain.Enum;
 
-public enum genderEnum {
+public enum GenderEnum {
    FEMALE,MALE,OTHER;
 
 }

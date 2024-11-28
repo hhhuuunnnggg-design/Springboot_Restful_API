@@ -4,7 +4,7 @@ import java.time.Instant;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import vn.hoidanit.jobhunter.domain.Enum.genderEnum;
+import vn.hoidanit.jobhunter.domain.Enum.GenderEnum;
 
 @Getter
 @Setter
@@ -15,7 +15,7 @@ public class ResUserDTO {
      long id;
      String email;
      String name;
-     genderEnum gender;
+     GenderEnum gender;
      String address;
      int age;
      Instant updatedAt;

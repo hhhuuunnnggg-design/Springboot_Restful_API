@@ -1,26 +1,28 @@
 package vn.hoidanit.jobhunter.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ResLoginDTO {
     @JsonProperty("access_token")
-    String accessToken;
-    UserLogin user;
+    private String accessToken;
+
+    private UserLogin user;
 
     @Getter
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
-    @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class UserLogin {
-        Long id;
-        String name;
-        String email;
+        private long id;
+        private String email;
+        private String name;
     }
 
     @Getter
@@ -30,6 +32,5 @@ public class ResLoginDTO {
     public static class UserGetAccount {
         private UserLogin user;
     }
-
 
 }

@@ -13,7 +13,7 @@ import vn.hoidanit.jobhunter.domain.RestResponse;
 import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
 
 @ControllerAdvice
-public class FormarRestResponse implements ResponseBodyAdvice {
+public class FormatRestResponse implements ResponseBodyAdvice {
 
     @Override
     public boolean supports(MethodParameter returnType, Class converterType) {

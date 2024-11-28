@@ -20,7 +20,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
@@ -28,8 +27,8 @@ import com.nimbusds.jose.util.Base64;
 
 import vn.hoidanit.jobhunter.util.SecurityUtil;
 
-@Configuration // quét tất cả các anotation
-@EnableMethodSecurity(securedEnabled = true) // để xem người dùng có quyền hạn hay không
+@Configuration
+@EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration {
 
     @Value("${hoidanit.jwt.base64-secret}")
@@ -45,26 +44,23 @@ public class SecurityConfiguration {
             HttpSecurity http,
             CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
         http
-                // 1. Tắt CSRF (Cross-Site Request Forgery) protection
                 .csrf(c -> c.disable())
-                // 2. Bật CORS (Cross-Origin Resource Sharing) với các cấu hình mặc định
                 .cors(Customizer.withDefaults())
-                // 3. Cấu hình quyền truy cập cho các request
                 .authorizeHttpRequests(
                         authz -> authz
-                                // 3.1 Cho phép truy cập không cần xác thực cho trang chủ ("/") và trang đăng nhập ("/login")
-                                .requestMatchers("/", "/api/v1/auth/login","/api/v1/auth/refresh").permitAll()
-                                // 3.2 Các request còn lại yêu cầu phải được xác thực
+                                .requestMatchers("/", "/api/v1/auth/login", "/api/v1/auth/refresh")
+                                .permitAll()
                                 .anyRequest().authenticated())
-                // 4. Cấu hình OAuth2 Resource Server với JWT
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())
-                        // 4.1 Đặt CustomAuthenticationEntryPoint làm entry point khi xác thực không thành công
-                        .authenticationEntryPoint((AuthenticationEntryPoint) customAuthenticationEntryPoint))
-                // 5. Tắt form login (không dùng cơ chế đăng nhập truyền thống với form HTML)
+                        .authenticationEntryPoint(customAuthenticationEntryPoint))
+                // .exceptionHandling(
+                // exceptions -> exceptions
+                // .authenticationEntryPoint(customAuthenticationEntryPoint) // 401
+                // .accessDeniedHandler(new BearerTokenAccessDeniedHandler())) // 403
+
                 .formLogin(f -> f.disable())
-                // 6. Cấu hình session không lưu trạng thái (stateless)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        // Trả về đối tượng SecurityFilterChain đã được cấu hình
+
         return http.build();
     }
 
@@ -73,6 +69,7 @@ public class SecurityConfiguration {
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         grantedAuthoritiesConverter.setAuthorityPrefix("");
         grantedAuthoritiesConverter.setAuthoritiesClaimName("permission");
+
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
         return jwtAuthenticationConverter;
