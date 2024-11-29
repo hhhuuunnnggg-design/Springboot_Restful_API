@@ -13,7 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import vn.hoidanit.jobhunter.domain.RestResponse;
+import vn.hoidanit.jobhunter.domain.response.RestResponse;
 
 @RestControllerAdvice // cái này có chức năng bắt lỗi toàn bộ hệ thống lun
 public class GlobalExcaption {// Phạm vi sử dụng là ở claau bồ

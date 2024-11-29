@@ -1,21 +1,18 @@
 package vn.hoidanit.jobhunter.service;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import vn.hoidanit.jobhunter.domain.Company;
-import vn.hoidanit.jobhunter.domain.dto.Meta;
-import vn.hoidanit.jobhunter.domain.dto.ResultPaginationDTO;
+import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.repository.CompanyRepository;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -28,13 +25,12 @@ public class CompanyService {
         return this.companyRepository.save(company);
     }
 
+    public ResultPaginationDTO handleGetAllCompany(Specification<Company> spect, Pageable pageable) {
+        Page<Company> companyPage = this.companyRepository.findAll(spect, pageable);
+        ResultPaginationDTO rs = new ResultPaginationDTO();
+        ResultPaginationDTO.Meta mt = new ResultPaginationDTO.Meta();
 
-    public ResultPaginationDTO handleGetAllCompany(Specification<Company>spect, Pageable pageable) {
-        Page<Company> companyPage = this.companyRepository.findAll(spect,pageable);
-        ResultPaginationDTO rs=new ResultPaginationDTO();
-        Meta mt=new Meta();
-
-        mt.setPage(pageable.getPageNumber()+1);
+        mt.setPage(pageable.getPageNumber() + 1);
         mt.setPageSize(pageable.getPageSize());
         mt.setTotal(companyPage.getTotalElements());
         mt.setPages(companyPage.getTotalPages());

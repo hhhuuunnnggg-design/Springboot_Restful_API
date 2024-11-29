@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.domain;
+package vn.hoidanit.jobhunter.domain.response;
 
 // import com.mysql.cj.x.protobuf.MysqlxDatatypes.Object;
 // import com.mysql.cj.x.protobuf.MysqlxDatatypes.Scalar.String;
